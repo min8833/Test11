@@ -18,6 +18,15 @@
       margin-top: 10px;
       font-size: 16px;
       width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #e0e0e0;
+      border: 1px solid #888;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #d5d5d5;
     }
     #result, #rateInfo {
       margin-top: 15px;
@@ -30,7 +39,7 @@
 <body>
   <h2 style="text-align:center">💱 실시간 환율 계산기</h2>
 
-  <input type="number" id="amount" placeholder="금액 입력 (예: 1000)">
+  <input type="number" id="amount" placeholder="금액 입력 (예: 1000)" />
 
   <select id="fromCurrency">
     <option value="USD">USD (달러)</option>
@@ -53,9 +62,13 @@
 
   <script>
     async function convertCurrency() {
-      const amount = parseFloat(document.getElementById('amount').value);
-      const from = document.getElementById('fromCurrency').value;
-      const to = document.getElementById('toCurrency').value;
+      const amountInput = document.getElementById('amount');
+      const fromCurrency = document.getElementById('fromCurrency');
+      const toCurrency = document.getElementById('toCurrency');
+
+      const amount = parseFloat(amountInput.value);
+      const from = fromCurrency.options[fromCurrency.selectedIndex].value;
+      const to = toCurrency.options[toCurrency.selectedIndex].value;
 
       if (isNaN(amount)) {
         document.getElementById('result').innerText = "금액을 입력하세요.";
@@ -84,8 +97,11 @@
       }
     }
 
-    // 초기 자동 호출
-    convertCurrency();
+    // 초기 자동 환율 정보 표시
+    window.onload = () => {
+      document.getElementById('amount').value = 1;
+      convertCurrency();
+    };
   </script>
 </body>
 </html>
