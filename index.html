@@ -1,1 +1,91 @@
-<!DOCTYPE html><html><head><meta charset='UTF-8'><title>복구용</title></head><body><p>환율 계산기 복구용</p></body></html>
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>실시간 환율 계산기</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+    }
+    input, select, button {
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+      width: 100%;
+    }
+    #result, #rateInfo {
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+      white-space: pre-line;
+    }
+  </style>
+</head>
+<body>
+  <h2 style="text-align:center">💱 실시간 환율 계산기</h2>
+
+  <input type="number" id="amount" placeholder="금액 입력 (예: 1000)">
+
+  <select id="fromCurrency">
+    <option value="USD">USD (달러)</option>
+    <option value="EUR">EUR (유로)</option>
+    <option value="JPY">JPY (엔)</option>
+    <option value="KRW">KRW (원)</option>
+  </select>
+
+  <select id="toCurrency">
+    <option value="KRW">KRW (원)</option>
+    <option value="USD">USD (달러)</option>
+    <option value="EUR">EUR (유로)</option>
+    <option value="JPY">JPY (엔)</option>
+  </select>
+
+  <button onclick="convertCurrency()">💸 계산하기</button>
+
+  <div id="rateInfo">환율 정보를 불러오는 중...</div>
+  <div id="result"></div>
+
+  <script>
+    async function convertCurrency() {
+      const amount = parseFloat(document.getElementById('amount').value);
+      const from = document.getElementById('fromCurrency').value;
+      const to = document.getElementById('toCurrency').value;
+
+      if (isNaN(amount)) {
+        document.getElementById('result').innerText = "금액을 입력하세요.";
+        return;
+      }
+
+      if (from === to) {
+        document.getElementById('rateInfo').innerText = `동일 통화: 1 ${from} = 1 ${to}`;
+        document.getElementById('result').innerText = `${amount} ${from} = ${amount.toFixed(2)} ${to}`;
+        return;
+      }
+
+      try {
+        const res = await fetch(`https://api.exchangerate.host/latest?base=${from}&symbols=${to}`);
+        const data = await res.json();
+        const rate = data.rates[to];
+        const date = data.date;
+
+        const converted = amount * rate;
+        document.getElementById('rateInfo').innerText = `📅 ${date} 기준
+1 ${from} = ${rate.toFixed(4)} ${to}`;
+        document.getElementById('result').innerText = `${amount} ${from} → ${converted.toFixed(2)} ${to}`;
+      } catch (err) {
+        document.getElementById('rateInfo').innerText = "❌ 환율 정보를 불러오지 못했습니다.";
+        document.getElementById('result').innerText = "";
+      }
+    }
+
+    // 초기 자동 호출
+    convertCurrency();
+  </script>
+</body>
+</html>
